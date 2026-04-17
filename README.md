@@ -31,9 +31,12 @@ sistema-alertas/
 │
 ├── app.py                  # Archivo principal de la aplicación (Rutas y Lógica)
 ├── chatbot.py              # Motor RAG local para el Asistente Inteligente
+├── telegram_bot.py         # Bot de Telegram (recibe mensajes, alertas y comandos como /salir)
 ├── models.py               # Modelos de Bases de Datos (Estudiantes, Alertas, BC...)
 ├── seed_db.py              # Script para poblar la BD con datos simulados
+├── upgrade_db.py           # Script para extender la BD (añade Chat IDs sin borrar data)
 ├── requirements.txt        # Dependencias de Python necesarias
+├── .env                    # Configuraciones de entorno (Ej. Token del Bot)
 ├── sistema_alertas.db      # ¡Tu Base de Datos SQLite autogenerada!
 │
 ├── static/
@@ -64,32 +67,35 @@ Abre una terminal o consola de comandos, ubícate en la carpeta del proyecto y e
 pip install -r requirements.txt
 ```
 
-### 3. Crear y Poblar la Base de Datos
-Para generar la base de datos `sistema_alertas.db` y llenarla con 20 alumnos de prueba y los textos para el chatbot Inteligente, ejecuta:
+### 3. Configurar Telegram (Opcional pero Recomendado)
+Si quieres probar el bot y las alertas en tu celular, debes crear el archivo `.env` vacío (si no existe) y añadirle el token que te dé BotFather en Telegram, así:
+`TELEGRAM_TOKEN=tu_token_aqui`
+
+### 4. Crear y Poblar la Base de Datos
+Para generar la base de datos `sistema_alertas.db` y llenarla con 20 alumnos de prueba y los textos para el chatbot Inteligente, ejecuta estos dos comandos en orden:
 
 ```bash
 python seed_db.py
+python upgrade_db.py
 ```
-*(Deberás ver un mensaje de éxito indicando que se crearon estudiantes, alertas y la base de conocimiento).*
 
-### 4. Arrancar el Servidor Web
-Una vez configurado todo, levanta la aplicación:
+### 5. Arrancar el Ecosistema
+El proyecto tiene dos motores: El servidor web (Para el profesor) y el bot (Para el alumno). Puedes abrir dos pestañas en tu terminal y correr ambos:
 
 ```bash
+# Terminal 1 (Servidor Web de Flask):
 python app.py
-```
 
-### 5. Usar el sistema
-Abre tu navegador de preferencia (Chrome, Edge, Firefox) y dirígete a:
-👉  **http://127.0.0.1:5000** 
+# Terminal 2 (Bot de Telegram para estudiantes):
+python telegram_bot.py
+```
+👉 Abre tu navegador y dirígete a: **http://127.0.0.1:5000** 
 
 ---
 
 ## 📖 Instrucciones de Uso Rápido (Demo)
 
-1. **Botón "Generar Alertas":** Si visitas el *Dashboard* o la pestaña de *Alertas*, verás este botón azul arriba a la derecha. Sirve para que el sistema escanee la BD en ese instante y levante notificaciones a profesores.
-2. **Atender Alerta:** Ve al panel de *Alertas*. Verás botones verdes (Atender) y naranjas (Escalar). Presiona uno para simular que como profesor ya actuaste al respecto. Verás cómo desaparece de tu bandeja de tareas.
-3. **Probar el RAG:** Ve a la pestaña *Chatbot*. 
-   * A la izquierda, selecciona el nombre de algún alumno.
-   * Selecciona una pregunta rápida, por ejemplo: *"Dame un plan de estudio personalizado"*.
-   * Verás que el Bot usa *su nombre*, revisa *su promedio*, detecta *su materia más débil* y además busca en la BD un plan de acción para guiarlo.
+1. **Botón "Generar Alertas":** Si visitas el *Dashboard* o *Alertas*, verás un botón azul arriba a la derecha. Si lo presionas y tu cuenta de Telegram está vinculada, recibirás la alerta Push en tiempo real en tu teléfono.
+2. **Atender Alerta:** Ve al panel de *Alertas*. Verás botones verdes (Atender) y naranjas (Escalar) que cambian estados en tiempo real sin recargar.
+3. **Probar el RAG en la Web:** Ve a la pestaña *Chatbot*, selecciona el nombre de un alumno y hazle consultas académicas.
+4. **Probar el RAG en Telegram:** Entra a Telegram y búscalo. Si quieres registrar otra cuenta de estudiante ficticio para la demostración, escríbele al bot el comando **`/salir`**, te desvinculará y permitirá meter otro correo (ej. *carlos.rodriguez@universidad.edu*).
